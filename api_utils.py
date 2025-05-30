@@ -339,7 +339,7 @@ class ApiUtils:
             if "application/json" in content_type:
                 return await response.json()
             return await response.text()
-        except Exception as e:
-            self.logger.error(f"Error parsing response: {str(e)}")
+        except (ValueError, AttributeError, json.JSONDecodeError) as e:
+            self.logger.exception("Error parsing response: %s", e)
             # Return the raw response or None depending on your error handling strategy
             return None
