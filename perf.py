@@ -44,17 +44,24 @@ def run():
         print(f"🎯 Ready to audit: {page.url}")
 
         # Step 4: Run Lighthouse via subprocess on current URL
-        subprocess.run([
-            "lighthouse",
-            page.url,
-            f"--port={REMOTE_DEBUGGING_PORT}",
-            "--output=json",
-            "--output=html",
-            "--output-path=lh-report",
-            "--only-categories=performance"
-        ])
-
-        print("✅ Lighthouse audit complete. Report saved as lh-report.html and lh-report.json.")
+        try:
+            # Use full path to lighthouse executable
+            lighthouse_path = "/usr/local/bin/lighthouse"  # Adjust this to your actual path
+            subprocess.run([
+                lighthouse_path,
+                page.url,
+                f"--port={REMOTE_DEBUGGING_PORT}",
+                "--output=json",
+                "--output=html",
+                "--output-path=lh-report",
+                "--only-categories=performance",
+            ], check=True)
+            
+            logging.info("Lighthouse audit complete. Report saved as lh-report.html and lh-report.json.")
+        except subprocess.CalledProcessError as e:
+            logging.error(f"Lighthouse audit failed: {e}")
+        except FileNotFoundError:
+            logging.error("Lighthouse executable not found. Please install it or provide the correct path.")
         browser.close()
 
 if __name__ == "__main__":
